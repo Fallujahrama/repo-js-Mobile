@@ -23,4 +23,13 @@ void main(List<String> arguments) {
   fl[1] = "dua";
   fl[2] = "tiga";
   stdout.writeln(fl);
+
+  var growList = [3, 4, 5];
+  growList.add(1);
+  growList.add(2);
+  growList.add(3);
+  growList.remove(2);
+
+  stdout.writeln(growList);
+
 }
