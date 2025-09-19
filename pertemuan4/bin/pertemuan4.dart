@@ -55,20 +55,38 @@ void main(List<String> arguments) {
   // }
   // print(setNilai3);
 
-  var setNilai3 = <String>{};
+  // var setNilai3 = <String>{};
 
-  stdout.write("Jumlah data setNilai3 = ");
-  String? input = stdin.readLineSync();
-  int jumlah1 = int.tryParse(input ?? '') ?? 0;
-  for (int i = 0; i < jumlah1; i++) {
-    stdout.write("Masukkan nilai ke-${i + 1} = ");
-    String? nilaiInput = stdin.readLineSync();
-    String nilai = nilaiInput ?? '';
-    setNilai3.add(nilai);
-  }
-  print(setNilai3);
-  // merubah set ke list
-  var nilaiList = setNilai3.toList();
-  print(nilaiList[2]);
+  // stdout.write("Jumlah data setNilai3 = ");
+  // String? input = stdin.readLineSync();
+  // int jumlah1 = int.tryParse(input ?? '') ?? 0;
+  // for (int i = 0; i < jumlah1; i++) {
+  //   stdout.write("Masukkan nilai ke-${i + 1} = ");
+  //   String? nilaiInput = stdin.readLineSync();
+  //   String nilai = nilaiInput ?? '';
+  //   setNilai3.add(nilai);
+  // }
+  // print(setNilai3);
+  // // merubah set ke list
+  // var nilaiList = setNilai3.toList();
+  // print(nilaiList[2]);
   // print(nilaiList.elementAt(1));
+
+  // map
+  var mapBio = {
+    'nim': '1501',
+    'nama': 'Fallujah',
+    'umur': 21,
+  };
+  print(mapBio);
+  print(mapBio['nama']);
+
+  var sudah = {
+    'nim' : ['1501', '1502'],
+    'nama' : ['Fallujah', 'Ramadi'],
+    'umur' : [21, 22],
+  };
+  print(sudah);
+  print(sudah['nama']?[1]);
+  print(sudah['nama']![0]);
 }
