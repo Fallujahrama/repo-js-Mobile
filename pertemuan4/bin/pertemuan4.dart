@@ -42,7 +42,20 @@ void main(List<String> arguments) {
   // // // irisan 2 set
   // print(setNilai1.intersection(setNilai2));
 
-  var setNilai3 = <int>{};
+  // var setNilai3 = <int>{};
+
+  // stdout.write("Jumlah data setNilai3 = ");
+  // String? input = stdin.readLineSync();
+  // int jumlah1 = int.tryParse(input ?? '') ?? 0;
+  // for (int i = 0; i < jumlah1; i++) {
+  //   stdout.write("Masukkan nilai ke-${i + 1} = ");
+  //   String? nilaiInput = stdin.readLineSync();
+  //   int nilai = int.tryParse(nilaiInput ?? '') ?? 0;
+  //   setNilai3.add(nilai);
+  // }
+  // print(setNilai3);
+
+  var setNilai3 = <String>{};
 
   stdout.write("Jumlah data setNilai3 = ");
   String? input = stdin.readLineSync();
@@ -50,8 +63,12 @@ void main(List<String> arguments) {
   for (int i = 0; i < jumlah1; i++) {
     stdout.write("Masukkan nilai ke-${i + 1} = ");
     String? nilaiInput = stdin.readLineSync();
-    int nilai = int.tryParse(nilaiInput ?? '') ?? 0;
+    String nilai = nilaiInput ?? '';
     setNilai3.add(nilai);
   }
   print(setNilai3);
+  // merubah set ke list
+  var nilaiList = setNilai3.toList();
+  print(nilaiList[2]);
+  // print(nilaiList.elementAt(1));
 }
