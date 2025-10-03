@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
+        
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -55,9 +56,27 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
+
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           child: const Icon(Icons.add),
+        ),
+
+        bottomNavigationBar: BottomNavigationBar(
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
         ),
       ),
     );
