@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+// Kelas untuk custom theme colors
+class CustomColors {
+  static const Color primaryColor = Color(0xFF2196F3); // Blue
+  static const Color secondaryColor = Color(0xFF03A9F4); // Light Blue
+  static const Color accentColor = Color(0xFFFF9800); // Orange
+  static const Color textPrimary = Color(0xFF212121); // Dark Grey
+  static const Color textSecondary = Color(0xFF757575); // Grey
+  static const Color background = Color(0xFFF5F5F5); // Light Grey
 }
 
 class MyApp extends StatelessWidget {
@@ -12,7 +23,43 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My Profile & Counter App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        // Custom color scheme
+        colorScheme: ColorScheme(
+          primary: CustomColors.primaryColor,
+          secondary: CustomColors.secondaryColor,
+          surface: Colors.white,
+          // ignore: deprecated_member_use
+          background: CustomColors.background,
+          error: Colors.red,
+          onPrimary: Colors.white,
+          onSecondary: Colors.black,
+          onSurface: CustomColors.textPrimary,
+          // ignore: deprecated_member_use
+          onBackground: CustomColors.textPrimary,
+          onError: Colors.white,
+          brightness: Brightness.light,
+        ),
+        // Google fonts untuk seluruh aplikasi
+        textTheme: GoogleFonts.poppinsTextTheme(
+          Theme.of(context).textTheme,
+        ),
+        // Tambahan kustomisasi
+        appBarTheme: AppBarTheme(
+          backgroundColor: CustomColors.primaryColor,
+          foregroundColor: Colors.white,
+          titleTextStyle: GoogleFonts.raleway(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: CustomColors.secondaryColor,
+            foregroundColor: Colors.white,
+            textStyle: GoogleFonts.poppins(),
+          ),
+        ),
         useMaterial3: true,
       ),
       home: const ProfilePage(),
@@ -27,8 +74,35 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil Mahasiswa'),
-        backgroundColor: Colors.blue,
+        title: Text(
+          'Profil Mahasiswa',
+          style: GoogleFonts.raleway(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: CustomColors.primaryColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'Info',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('About', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                  content: Text(
+                    'Aplikasi ini dibuat untuk tugas pertemuan 6 Flutter.',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -42,7 +116,7 @@ class ProfilePage extends StatelessWidget {
           ),
         ],
         currentIndex: 0, // Set the current index to highlight the selected item
-        selectedItemColor: Colors.blue,
+        selectedItemColor: CustomColors.primaryColor,
         onTap: (index) {
           if (index == 1) {
             // Navigate to the Counter page
@@ -68,7 +142,7 @@ class ProfilePage extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.blue, width: 2),
+                border: Border.all(color: CustomColors.primaryColor, width: 2),
               ),
               child: ClipOval(
                 child: Image.asset(
@@ -92,27 +166,27 @@ class ProfilePage extends StatelessWidget {
             // Nama, NIM, dan Jurusan
             Text(
               'Fallujah Ramadi C',
-              style: TextStyle(
+              style: GoogleFonts.montserrat(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue.shade800,
+                color: CustomColors.primaryColor,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'NIM: 2341760005',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 18,
-                color: Colors.grey.shade700,
+                color: CustomColors.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Prodi Sistem Informasi Bisnis',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontStyle: FontStyle.italic,
-                color: Colors.grey.shade700,
+                color: CustomColors.textSecondary,
               ),
             ),
             const SizedBox(height: 20),
@@ -120,13 +194,13 @@ class ProfilePage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.email, color: Colors.blue),
+                Icon(Icons.email, color: CustomColors.secondaryColor),
                 const SizedBox(width: 8),
                 Text(
                   '2341760004@student.polinema.ac.id',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
-                    color: Colors.grey.shade700,
+                    color: CustomColors.textSecondary,
                   ),
                 ),
               ],
@@ -135,14 +209,44 @@ class ProfilePage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.phone, color: Colors.blue),
+                Icon(Icons.phone, color: CustomColors.secondaryColor),
                 const SizedBox(width: 8),
                 Text(
                   '0857 1804 0815',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
-                    color: Colors.grey.shade700,
+                    color: CustomColors.textSecondary,
                   ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 25),
+            // Social Media IconButtons (Bonus Feature)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.camera_alt),
+                  color: CustomColors.accentColor,
+                  iconSize: 30,
+                  tooltip: 'Instagram',
+                ),
+                const SizedBox(width: 15),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.code),
+                  color: CustomColors.primaryColor,
+                  iconSize: 30,
+                  tooltip: 'GitHub',
+                ),
+                const SizedBox(width: 15),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.business_center),
+                  color: CustomColors.secondaryColor,
+                  iconSize: 30,
+                  tooltip: 'LinkedIn',
                 ),
               ],
             ),
@@ -187,8 +291,18 @@ class _CounterPageState extends State<CounterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Counter App'),
-        backgroundColor: Colors.blue,
+        title: Text(
+          'Counter App',
+          style: GoogleFonts.raleway(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: CustomColors.primaryColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reset Counter',
+            onPressed: _resetCounter,
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -202,7 +316,7 @@ class _CounterPageState extends State<CounterPage> {
           ),
         ],
         currentIndex: 1, // Set the current index to highlight Counter tab
-        selectedItemColor: Colors.blue,
+        selectedItemColor: CustomColors.primaryColor,
         onTap: (index) {
           if (index == 0) {
             // Navigate back to Profile page
@@ -214,14 +328,21 @@ class _CounterPageState extends State<CounterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'Angka Saat ini:',
-              style: TextStyle(fontSize: 16),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: CustomColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
               '$counter',
-              style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+              style: GoogleFonts.montserrat(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                color: CustomColors.primaryColor,
+              ),
             ),
             const SizedBox(height: 30),
             Row(
@@ -233,16 +354,25 @@ class _CounterPageState extends State<CounterPage> {
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
-                  child: const Text('-', style: TextStyle(fontSize: 24, color: Colors.white)),
+                  child: Text(
+                    '-',
+                    style: GoogleFonts.poppins(fontSize: 24, color: Colors.white),
+                  ),
                 ),
                 const SizedBox(width: 20),
                 OutlinedButton(
                   onPressed: _resetCounter,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.blue, width: 1),
+                    side: BorderSide(color: CustomColors.primaryColor, width: 1),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
-                  child: const Text('Reset', style: TextStyle(fontSize: 18)),
+                  child: Text(
+                    'Reset',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18, 
+                      color: CustomColors.primaryColor,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 20),
                 ElevatedButton(
@@ -251,7 +381,10 @@ class _CounterPageState extends State<CounterPage> {
                     backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
-                  child: const Text('+', style: TextStyle(fontSize: 24, color: Colors.white)),
+                  child: Text(
+                    '+',
+                    style: GoogleFonts.poppins(fontSize: 24, color: Colors.white),
+                  ),
                 ),
               ],
             ),
