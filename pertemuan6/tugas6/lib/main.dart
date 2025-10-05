@@ -43,15 +43,15 @@ class ProfilePage extends StatelessWidget {
         ],
         currentIndex: 0, // Set the current index to highlight the selected item
         selectedItemColor: Colors.blue,
-        // onTap: (index) {
-        //   if (index == 1) {
-        //     // Navigate to the Counter page
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (context) => const CounterPage()),
-        //     );
-        //   }
-        // },
+        onTap: (index) {
+          if (index == 1) {
+            // Navigate to the Counter page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CounterPage()),
+            );
+          }
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -153,3 +153,118 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+class CounterPage extends StatefulWidget {
+  const CounterPage({super.key});
+
+  @override
+  State<CounterPage> createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  int counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      counter++;
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      if (counter > 0) {
+        counter--;
+      }
+    });
+  }
+
+  void _resetCounter() {
+    setState(() {
+      counter = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Counter App'),
+        backgroundColor: Colors.blue,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Counter',
+          ),
+        ],
+        currentIndex: 1, // Set the current index to highlight Counter tab
+        selectedItemColor: Colors.blue,
+        onTap: (index) {
+          if (index == 0) {
+            // Navigate back to Profile page
+            Navigator.pop(context);
+          }
+        },
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Angka Saat ini:',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              '$counter',
+              style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _decrementCounter,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  child: const Text('-', style: TextStyle(fontSize: 24, color: Colors.white)),
+                ),
+                const SizedBox(width: 20),
+                OutlinedButton(
+                  onPressed: _resetCounter,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.blue, width: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  child: const Text('Reset', style: TextStyle(fontSize: 18)),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _incrementCounter,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  child: const Text('+', style: TextStyle(fontSize: 24, color: Colors.white)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+}
