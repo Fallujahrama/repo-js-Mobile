@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MyApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => HomePage(),
+      '/secondPage': (context) => SecondPage(),
+    },
+  ));
 }
 
 class MyApp extends StatelessWidget {
+  final String initialRoute;
+  final Map<String, WidgetBuilder> routes;
+
+  MyApp({required this.initialRoute, required this.routes});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomePage(),
+      initialRoute: initialRoute,
+      routes: routes,
     );
   }
 }
@@ -22,10 +34,8 @@ class HomePage extends StatelessWidget {
       ),
       body: Center(
         child: ElevatedButton(
-          child: Text('Ke halaman 2'),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => SecondPage())); 
-          },
+          onPressed: () => Navigator.pushNamed(context, '/secondPage'),
+          child: Text('Go to Second Page'),
         ),
       ),
     );
