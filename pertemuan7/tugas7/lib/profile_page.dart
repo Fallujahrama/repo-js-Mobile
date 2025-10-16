@@ -120,11 +120,15 @@ class ProfilePage extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: CircleAvatar(
-                            child: Text(mataKuliah[index]['sks'].toString()),
+                            backgroundColor: Colors.blue,
+                            child: Text(
+                              mataKuliah[index]['sks'].toString(),
+                              style: const TextStyle(color: Colors.white),
+                            ),
                           ),
                           title: Text(mataKuliah[index]['nama']),
                           subtitle: Text('Kode: ${mataKuliah[index]['kode']}'),
-                          trailing: const Icon(Icons.book),
+                          trailing: const Icon(Icons.book, color: Colors.blue),
                         ),
                       );
                     },
