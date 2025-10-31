@@ -1,6 +1,21 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    
+    <!-- Permission untuk akses kamera -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    
+    <!-- Permission untuk menyimpan foto ke Gallery (Android 12 ke bawah) -->
+    <!-- tools:replace untuk mengatasi konflik dengan camera plugin -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="32"
+                     tools:replace="android:maxSdkVersion" />
+    
+    <!-- Permission untuk Android 13+ (API 33+) - Required by Gal plugin -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    
     <application
-        android:label="tugas9"
+        android:label="Camera App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
