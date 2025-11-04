@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +12,325 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Geolocator Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const GeolocatorWidget(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class GeolocatorWidget extends StatefulWidget {
+  const GeolocatorWidget({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<GeolocatorWidget> createState() => _GeolocatorWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _GeolocatorWidgetState extends State<GeolocatorWidget> {
+  static const String _kLocationServicesDisabledMessage =
+      'Location services are disabled.';
+  static const String _kPermissionDeniedMessage = 'Permission denied.';
+  static const String _kPermissionDeniedForeverMessage =
+      'Permission denied forever.';
+  static const String _kPermissionGrantedMessage = 'Permission granted.';
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  final List<_PositionItem> _positionItems = <_PositionItem>[];
+  StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<ServiceStatus>? _serviceStatusStreamSubscription;
+  bool positionStreamStarted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _toggleServiceStatusStream();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    const sizedBox = SizedBox(height: 10);
+
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Geolocator Demo'),
+        actions: [
+          PopupMenuButton(
+            elevation: 40,
+            onSelected: (value) async {
+              switch (value) {
+                case 1:
+                  _getLocationAccuracy();
+                  break;
+                case 2:
+                  _requestTemporaryFullAccuracy();
+                  break;
+                case 3:
+                  _openAppSettings();
+                  break;
+                case 4:
+                  _openLocationSettings();
+                  break;
+                case 5:
+                  setState(_positionItems.clear);
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              if (!kIsWeb && Platform.isIOS)
+                const PopupMenuItem(
+                  value: 1,
+                  child: Text("Get Location Accuracy"),
+                ),
+              if (!kIsWeb && Platform.isIOS)
+                const PopupMenuItem(
+                  value: 2,
+                  child: Text("Request Temporary Full Accuracy"),
+                ),
+              const PopupMenuItem(
+                value: 3,
+                child: Text("Open App Settings"),
+              ),
+              if (!kIsWeb && (Platform.isAndroid || Platform.isWindows))
+                const PopupMenuItem(
+                  value: 4,
+                  child: Text("Open Location Settings"),
+                ),
+              const PopupMenuItem(
+                value: 5,
+                child: Text("Clear"),
+              ),
+            ],
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      body: ListView.builder(
+        itemCount: _positionItems.length,
+        itemBuilder: (context, index) {
+          final positionItem = _positionItems[index];
+
+          if (positionItem.type == _PositionItemType.log) {
+            return ListTile(
+              title: Text(
+                positionItem.displayValue,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            );
+          } else {
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: ListTile(
+                title: Text(positionItem.displayValue),
+              ),
+            );
+          }
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: 'toggle',
+            onPressed: () {
+              positionStreamStarted = !positionStreamStarted;
+              _toggleListening();
+            },
+            tooltip: (_positionStreamSubscription == null)
+                ? 'Start position updates'
+                : _positionStreamSubscription!.isPaused
+                    ? 'Resume'
+                    : 'Pause',
+            backgroundColor: _determineButtonColor(),
+            child: (_positionStreamSubscription == null ||
+                    _positionStreamSubscription!.isPaused)
+                ? const Icon(Icons.play_arrow)
+                : const Icon(Icons.pause),
+          ),
+          sizedBox,
+          FloatingActionButton(
+            heroTag: 'current',
+            onPressed: _getCurrentPosition,
+            child: const Icon(Icons.my_location),
+          ),
+          sizedBox,
+          FloatingActionButton(
+            heroTag: 'last',
+            onPressed: _getLastKnownPosition,
+            child: const Icon(Icons.bookmark),
+          ),
+        ],
+      ),
     );
   }
+
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handlePermission();
+    if (!hasPermission) return;
+
+    final position = await _geolocatorPlatform.getCurrentPosition();
+    _updatePositionList(_PositionItemType.position, position.toString());
+  }
+
+  Future<bool> _handlePermission() async {
+    bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _updatePositionList(_PositionItemType.log, _kLocationServicesDisabledMessage);
+      return false;
+    }
+
+    LocationPermission permission = await _geolocatorPlatform.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await _geolocatorPlatform.requestPermission();
+      if (permission == LocationPermission.denied) {
+        _updatePositionList(_PositionItemType.log, _kPermissionDeniedMessage);
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _updatePositionList(_PositionItemType.log, _kPermissionDeniedForeverMessage);
+      return false;
+    }
+
+    _updatePositionList(_PositionItemType.log, _kPermissionGrantedMessage);
+    return true;
+  }
+
+  void _updatePositionList(_PositionItemType type, String displayValue) {
+    _positionItems.add(_PositionItem(type, displayValue));
+    setState(() {});
+  }
+
+  bool _isListening() => !(_positionStreamSubscription == null ||
+      _positionStreamSubscription!.isPaused);
+
+  Color _determineButtonColor() {
+    return _isListening() ? Colors.green : Colors.red;
+  }
+
+  void _toggleServiceStatusStream() {
+    // getServiceStatusStream is not supported on web platform
+    if (kIsWeb) {
+      return;
+    }
+    
+    if (_serviceStatusStreamSubscription == null) {
+      final serviceStatusStream = _geolocatorPlatform.getServiceStatusStream();
+      _serviceStatusStreamSubscription = serviceStatusStream.handleError((error) {
+        _serviceStatusStreamSubscription?.cancel();
+        _serviceStatusStreamSubscription = null;
+      }).listen((serviceStatus) {
+        String serviceStatusValue;
+        if (serviceStatus == ServiceStatus.enabled) {
+          if (positionStreamStarted) _toggleListening();
+          serviceStatusValue = 'enabled';
+        } else {
+          if (_positionStreamSubscription != null) {
+            setState(() {
+              _positionStreamSubscription?.cancel();
+              _positionStreamSubscription = null;
+              _updatePositionList(_PositionItemType.log, 'Position Stream has been canceled');
+            });
+          }
+          serviceStatusValue = 'disabled';
+        }
+        _updatePositionList(_PositionItemType.log, 'Location service has been $serviceStatusValue');
+      });
+    }
+  }
+
+  void _toggleListening() {
+    if (_positionStreamSubscription == null) {
+      final positionStream = _geolocatorPlatform.getPositionStream();
+      _positionStreamSubscription = positionStream.handleError((error) {
+        _positionStreamSubscription?.cancel();
+        _positionStreamSubscription = null;
+      }).listen((position) => _updatePositionList(_PositionItemType.position, position.toString()));
+      _positionStreamSubscription?.pause();
+    }
+
+    setState(() {
+      if (_positionStreamSubscription == null) return;
+
+      String statusDisplayValue;
+      if (_positionStreamSubscription!.isPaused) {
+        _positionStreamSubscription!.resume();
+        statusDisplayValue = 'resumed';
+      } else {
+        _positionStreamSubscription!.pause();
+        statusDisplayValue = 'paused';
+      }
+
+      _updatePositionList(_PositionItemType.log, 'Listening for position updates $statusDisplayValue');
+    });
+  }
+
+  void _getLastKnownPosition() async {
+    final position = await _geolocatorPlatform.getLastKnownPosition();
+    if (position != null) {
+      _updatePositionList(_PositionItemType.position, position.toString());
+    } else {
+      _updatePositionList(_PositionItemType.log, 'No last known position available');
+    }
+  }
+
+  void _getLocationAccuracy() async {
+    final status = await _geolocatorPlatform.getLocationAccuracy();
+    _handleLocationAccuracyStatus(status);
+  }
+
+  void _requestTemporaryFullAccuracy() async {
+    final status = await _geolocatorPlatform.requestTemporaryFullAccuracy(
+      purposeKey: "TemporaryPreciseAccuracy",
+    );
+    _handleLocationAccuracyStatus(status);
+  }
+
+  void _handleLocationAccuracyStatus(LocationAccuracyStatus status) {
+    String locationAccuracyStatusValue;
+    if (status == LocationAccuracyStatus.precise) {
+      locationAccuracyStatusValue = 'Precise';
+    } else if (status == LocationAccuracyStatus.reduced) {
+      locationAccuracyStatusValue = 'Reduced';
+    } else {
+      locationAccuracyStatusValue = 'Unknown';
+    }
+    _updatePositionList(_PositionItemType.log, '$locationAccuracyStatusValue location accuracy granted.');
+  }
+
+  void _openAppSettings() async {
+    final opened = await _geolocatorPlatform.openAppSettings();
+    String displayValue = opened ? 'Opened Application Settings.' : 'Error opening Application Settings.';
+    _updatePositionList(_PositionItemType.log, displayValue);
+  }
+
+  void _openLocationSettings() async {
+    final opened = await _geolocatorPlatform.openLocationSettings();
+    String displayValue = opened ? 'Opened Location Settings' : 'Error opening Location Settings';
+    _updatePositionList(_PositionItemType.log, displayValue);
+  }
+
+  @override
+  void dispose() {
+    _positionStreamSubscription?.cancel();
+    _serviceStatusStreamSubscription?.cancel();
+    super.dispose();
+  }
+}
+
+enum _PositionItemType { log, position }
+
+class _PositionItem {
+  _PositionItem(this.type, this.displayValue);
+  final _PositionItemType type;
+  final String displayValue;
 }
