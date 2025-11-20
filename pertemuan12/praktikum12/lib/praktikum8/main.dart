@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiConfig {
-  static const String baseUrl = 'https://31qz1.wiremockapi.cloud/';
+  static const String baseUrl = 'https://07r1y.wiremockapi.cloud';
   static const String usersEndpoint = '/users';
   static const int timeoutSeconds = 30;
 
@@ -88,7 +88,7 @@ class _UserPageState extends State<UserPage> {
       return;
     }
 
-    setState(() => _postMessage = null); // Bersihkan pesan lama
+    setState(() => _postMessage = null);
 
     final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.usersEndpoint}');
     final body = jsonEncode({'name': name, 'email': email});
@@ -98,15 +98,30 @@ class _UserPageState extends State<UserPage> {
           .post(url, headers: ApiConfig.headers, body: body)
           .timeout(const Duration(seconds: 10));
 
-      final Map<String, dynamic> result = jsonDecode(response.body);
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        setState(() {
-          _postMessage = result['message'] ?? 'User berhasil ditambahkan!';
-        });
+        try {
+          // Coba decode sebagai Map dulu
+          final result = jsonDecode(response.body);
+          
+          if (result is Map<String, dynamic>) {
+            setState(() {
+              _postMessage = result['message'] ?? 'User berhasil ditambahkan!';
+            });
+          } else {
+            // Jika bukan Map (mungkin List atau String)
+            setState(() {
+              _postMessage = 'User berhasil ditambahkan!';
+            });
+          }
+        } catch (e) {
+          setState(() {
+            _postMessage = 'User berhasil ditambahkan!';
+          });
+        }
+        
         _nameController.clear();
         _emailController.clear();
-        fetchUsers(); // Refresh list user
+        fetchUsers();
       } else {
         setState(() {
           _postMessage = 'Gagal menambah user (${response.statusCode})';
